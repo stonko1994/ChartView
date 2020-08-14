@@ -16,7 +16,7 @@ struct Legend: View {
     @Binding var frame: CGRect
     @Binding var hideHorizontalLines: Bool
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-    let padding:CGFloat = 3
+    let padding:CGFloat = 30
 
     public var valueSpecifier: String = "%.2f"
 

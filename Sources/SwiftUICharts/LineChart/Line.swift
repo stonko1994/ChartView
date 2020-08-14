@@ -69,7 +69,7 @@ public struct Line: View {
                     .animation(.easeIn(duration: 1.6))
             }
             self.path
-                .trim(from: 0, to: self.showFull ? 1:0)
+                .trim(from: 0, to: self.showFull ? 1 : 0)
                 .stroke(LinearGradient(gradient: gradient.getGradient(), startPoint: .leading, endPoint: .trailing) ,style: StrokeStyle(lineWidth: 3, lineJoin: .round))
                 .rotationEffect(.degrees(180), anchor: .center)
                 .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
@@ -100,7 +100,10 @@ public struct Line: View {
 struct Line_Previews: PreviewProvider {
     static var previews: some View {
         GeometryReader{ geometry in
-            Line(data: ChartData(points: [12,-230,10,54]), frame: .constant(geometry.frame(in: .local)), touchLocation: .constant(CGPoint(x: 100, y: 12)), showIndicator: .constant(true), minDataValue: .constant(nil), maxDataValue: .constant(nil))
+            Line(data: ChartData(points: [0,20,10,100]), frame: .constant(geometry.frame(in: .local)), touchLocation: .constant(CGPoint(x: 100, y: 12)), showIndicator: .constant(true), minDataValue: .constant(nil), maxDataValue: .constant(nil))
+                .border(Color.black, width: 1)
+                .background(Color.blue.opacity(0.5))
+
         }.frame(width: 320, height: 160)
     }
 }

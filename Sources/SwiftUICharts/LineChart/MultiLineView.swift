@@ -95,7 +95,7 @@ public struct MultiLineView: View {
                                      showBackground: false,
                                      gradient: self.data[i].getGradient()
                                 )
-                                .offset(x: 30, y: -20)
+                                .offset(x: 30, y: 0)
                                 .onAppear(){
                                     self.showLegend = true
                                 }
@@ -112,7 +112,7 @@ public struct MultiLineView: View {
                         valueSpecifier: self.valueSpecifier
                     )
                     .opacity(self.opacity)
-                    .offset(x: self.dragLocation.x - geometry.frame(in: .local).size.width/2, y: 36)
+                    .offset(x: self.dragLocation.x - geometry.frame(in: .local).size.width/2, y: 52)
                 }
                 .frame(width: geometry.frame(in: .local).size.width, height: 240)
                 .gesture(DragGesture()
