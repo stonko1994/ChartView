@@ -9,10 +9,11 @@
 import SwiftUI
 
 struct IndicatorPoint: View {
+    public var color: GradientColor = GradientColor(start: Colors.IndicatorKnob, end: Colors.IndicatorKnob)
     var body: some View {
         ZStack{
             Circle()
-                .fill(Colors.IndicatorKnob)
+                .fill(color.start)
             Circle()
                 .stroke(Color.white, style: StrokeStyle(lineWidth: 4))
         }

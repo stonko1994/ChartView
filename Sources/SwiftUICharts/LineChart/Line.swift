@@ -82,7 +82,7 @@ public struct Line: View {
             }
             .drawingGroup()
             if(self.showIndicator) {
-                IndicatorPoint()
+                IndicatorPoint(color: gradient)
                     .position(self.getClosestPointOnPath(touchLocation: self.touchLocation))
                     .rotationEffect(.degrees(180), anchor: .center)
                     .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))

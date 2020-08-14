@@ -17,9 +17,9 @@ public struct MultiLineView: View {
     @State private var showLegend = false
     @State private var dragLocation:CGPoint = .zero
     @State private var indicatorLocation:CGPoint = .zero
-    @State private var closestPoint: CGPoint = .zero
-    @State private var opacity:Double = 0
-    @State private var currentDataNumber: Double = 0
+//    @State private var closestPoints: [CGPoint] = []
+    @State private var opacity: Double = 0
+    @State private var currentDataNumbers: [MagnifierValues] = []
     @State private var hideHorizontalLines: Bool = false
 
     public init(data: [LineData],
@@ -34,6 +34,20 @@ public struct MultiLineView: View {
         self.style = style
         self.valueSpecifier = valueSpecifier!
         self.darkModeStyle = style.darkModeStyle != nil ? style.darkModeStyle! : Styles.lineViewDarkMode
+    }
+
+    var globalMin: Double {
+        if let min = data.flatMap({ $0.onlyPoints() }).min() {
+            return min
+        }
+        return 0
+    }
+
+    var globalMax: Double {
+        if let max = data.flatMap({ $0.onlyPoints() }).max() {
+            return max
+        }
+        return 0
     }
 
     public var body: some View {
@@ -70,10 +84,10 @@ public struct MultiLineView: View {
                                      frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 30, height: reader.frame(in: .local).height)),
                                      touchLocation: self.$indicatorLocation,
                                      showIndicator: self.$hideHorizontalLines,
-                                     minDataValue: .constant(nil),
-                                     maxDataValue: .constant(nil),
+                                     minDataValue: .constant(self.globalMin),
+                                     maxDataValue: .constant(self.globalMax),
                                      showBackground: false,
-                                     gradient: self.style.gradientColor
+                                     gradient: self.data[i].getGradient()
                                 )
                                 .offset(x: 30, y: -20)
                                 .onAppear(){
@@ -87,9 +101,12 @@ public struct MultiLineView: View {
                     }
                     .frame(width: geometry.frame(in: .local).size.width, height: 240)
                     .offset(x: 0, y: 40 )
-                    MagnifierRect(currentNumber: self.$currentDataNumber, valueSpecifier: self.valueSpecifier)
-                        .opacity(self.opacity)
-                        .offset(x: self.dragLocation.x - geometry.frame(in: .local).size.width/2, y: 36)
+                    MultiMagnifierRect(
+                        currentNumbers: self.$currentDataNumbers,
+                        valueSpecifier: self.valueSpecifier
+                    )
+                    .opacity(self.opacity)
+                    .offset(x: self.dragLocation.x - geometry.frame(in: .local).size.width/2, y: 36)
                 }
                 .frame(width: geometry.frame(in: .local).size.width, height: 240)
                 .gesture(DragGesture()
@@ -97,7 +114,7 @@ public struct MultiLineView: View {
                     self.dragLocation = value.location
                     self.indicatorLocation = CGPoint(x: max(value.location.x-30,0), y: 32)
                     self.opacity = 1
-//                    self.closestPoint = self.getClosestDataPoint(toPoint: value.location, width: geometry.frame(in: .local).size.width-30, height: 240)
+                    self.getClosestDataPoints(toPoint: value.location, width: geometry.frame(in: .local).size.width-30, height: 240)
                     self.hideHorizontalLines = true
                 })
                     .onEnded({ value in
@@ -109,18 +126,20 @@ public struct MultiLineView: View {
         }
     }
 
-//    func getClosestDataPoint(toPoint: CGPoint, width:CGFloat, height: CGFloat) -> CGPoint {
-//        let points = self.data.onlyPoints()
-//        let stepWidth: CGFloat = width / CGFloat(points.count-1)
-//        let stepHeight: CGFloat = height / CGFloat(points.max()! + points.min()!)
-//
-//        let index:Int = Int(floor((toPoint.x-15)/stepWidth))
-//        if (index >= 0 && index < points.count){
-//            self.currentDataNumber = points[index]
-//            return CGPoint(x: CGFloat(index)*stepWidth, y: CGFloat(points[index])*stepHeight)
-//        }
-//        return .zero
-//    }
+    func getClosestDataPoints(toPoint: CGPoint, width:CGFloat, height: CGFloat) {
+        self.currentDataNumbers = self.data.compactMap { data in
+            let points = data.onlyPoints()
+            let stepWidth: CGFloat = width / CGFloat(points.count-1)
+//            let stepHeight: CGFloat = height / CGFloat(points.max()! + points.min()!)
+
+            let index:Int = Int(floor((toPoint.x-15)/stepWidth))
+            if (index >= 0 && index < points.count) {
+                return MagnifierValues(value: points[index], color: data.getGradient())
+            }
+            return nil
+        }
+        print("[log] \(currentDataNumbers)")
+    }
 }
 
 struct MultiLineView_Previews: PreviewProvider {
