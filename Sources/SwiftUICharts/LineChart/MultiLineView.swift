@@ -22,18 +22,21 @@ public struct MultiLineView: View {
     @State private var currentDataNumbers: [MagnifierValues] = []
     @State private var hideHorizontalLines: Bool = false
 
-    public init(data: [LineData],
-                title: String? = nil,
-                legend: String? = nil,
-                style: ChartStyle = Styles.lineChartStyleOne,
-                valueSpecifier: String? = "%.1f") {
+    public init(
+        data: [LineData],
+        title: String? = nil,
+        legend: String? = nil,
+        style: ChartStyle = Styles.lineChartStyleOne,
+        darkModeStyle: ChartStyle = Styles.lineViewDarkMode,
+        valueSpecifier: String? = "%.1f"
+    ) {
 
         self.data = data.map { MultiLineChartData(points: $0.dataPoints, gradient: $0.color) }
         self.title = title
         self.legend = legend
         self.style = style
         self.valueSpecifier = valueSpecifier!
-        self.darkModeStyle = style.darkModeStyle != nil ? style.darkModeStyle! : Styles.lineViewDarkMode
+        self.darkModeStyle = darkModeStyle
     }
 
     var globalMin: Double {
@@ -165,11 +168,15 @@ struct MultiLineView_Previews: PreviewProvider {
         )
 
         return Group {
-            MultiLineView(
-                data: [line1, line2, line3, line4],
-                title: "Full chart",
-                style: Styles.lineChartStyleOne
-            )
+            ZStack {
+                Rectangle().fill(Color.gray)
+
+                MultiLineView(
+                    data: [line1, line2, line3, line4],
+                    title: "Full chart",
+                    style: Styles.lineChartStyleOne
+                ).environment(\.colorScheme, .dark)
+            }
 
 //            MultiLineView(data: [282.502, 284.495, 283.51, 285.019, 285.197, 286.118, 288.737, 288.455, 289.391, 287.691, 285.878, 286.46, 286.252, 284.652, 284.129, 284.188], title: "Full chart", style: Styles.lineChartStyleOne)
 
