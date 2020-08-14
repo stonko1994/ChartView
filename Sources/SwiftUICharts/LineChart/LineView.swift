@@ -59,10 +59,15 @@ public struct LineView: View {
                         Rectangle()
                             .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.backgroundColor : self.style.backgroundColor)
                         if(self.showLegend){
-                            Legend(data: self.data,
-                                   frame: .constant(reader.frame(in: .local)), hideHorizontalLines: self.$hideHorizontalLines)
-                                .transition(.opacity)
-                                .animation(Animation.easeOut(duration: 1).delay(1))
+                            Legend(
+                                max: self.data.onlyPoints().max()!,
+                                min: self.data.onlyPoints().min()!,
+                                dataPointsCount: self.data.onlyPoints().count,
+                                frame: .constant(reader.frame(in: .local)),
+                                hideHorizontalLines: self.$hideHorizontalLines
+                            )
+                            .transition(.opacity)
+                            .animation(Animation.easeOut(duration: 1).delay(1))
                         }
                         Line(data: self.data,
                              frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 30, height: reader.frame(in: .local).height)),

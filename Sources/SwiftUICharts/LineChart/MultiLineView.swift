@@ -11,7 +11,7 @@ public struct MultiLineView: View {
     public var legend: String?
     public var style: ChartStyle
     public var darkModeStyle: ChartStyle
-    public var valueSpecifier:String
+    public var valueSpecifier: String
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @State private var showLegend = false
@@ -74,9 +74,12 @@ public struct MultiLineView: View {
                             .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.backgroundColor : self.style.backgroundColor)
                         if self.showLegend {
                             Legend(
-                                data: ChartData(values: self.data.flatMap { $0.points }),
+                                max: self.data.flatMap { $0.onlyPoints() }.max()!,
+                                min: self.data.flatMap { $0.onlyPoints() }.min()!,
+                                dataPointsCount: self.data[0].onlyPoints().count,
                                 frame: .constant(reader.frame(in: .local)),
-                                hideHorizontalLines: self.$hideHorizontalLines
+                                hideHorizontalLines: self.$hideHorizontalLines,
+                                valueSpecifier: "%.0f"
                             )
                             .transition(.opacity)
                             .animation(Animation.easeOut(duration: 1).delay(1))
