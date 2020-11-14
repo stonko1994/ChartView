@@ -116,29 +116,44 @@ public struct MultiLineView: View {
                 }
                 .frame(width: geometry.frame(in: .local).size.width, height: 240)
                 .gesture(DragGesture()
-                .onChanged({ value in
-                    self.dragLocation = value.location
-                    self.indicatorLocation = CGPoint(x: max(value.location.x-30,0), y: 32)
-                    self.opacity = 1
-                    self.getClosestDataPoints(toPoint: value.location, width: geometry.frame(in: .local).size.width-30, height: 240)
-                    self.hideHorizontalLines = true
-                })
-                    .onEnded({ value in
+                    .onChanged { value in
+                        let width = geometry.frame(in: .local).size.width
+                        self.dragLocation = CGPoint(
+                            x: clamp(value.location.x, min: 30, max: width),
+                            y: value.location.y
+                        )
+                        self.indicatorLocation = CGPoint(
+                            x: max(value.location.x - 30, 0),
+                            y: 32
+                        )
+                        self.opacity = 1
+                        self.getClosestDataPoints(
+                            to: self.dragLocation,
+                            width: width,
+                            height: 240
+                        )
+                        self.hideHorizontalLines = true
+                    }
+                    .onEnded{ value in
                         self.opacity = 0
                         self.hideHorizontalLines = false
-                    })
+                    }
                 )
             }
         }
     }
 
-    func getClosestDataPoints(toPoint: CGPoint, width:CGFloat, height: CGFloat) {
+    func getClosestDataPoints(to point: CGPoint, width:CGFloat, height: CGFloat) {
         self.currentDataNumbers = self.data.compactMap { data in
             let points = data.onlyPoints()
             let stepWidth: CGFloat = width / CGFloat(points.count)
 //            let stepHeight: CGFloat = height / CGFloat(points.max()! + points.min()!)
 
-            let index:Int = Int(floor((toPoint.x-15)/stepWidth))
+            let index:Int = clamp(
+                Int(floor(point.x / stepWidth)),
+                min: 0,
+                max: points.count - 1
+            )
             if (index >= 0 && index < points.count) {
                 return MagnifierValues(value: points[index], color: data.getGradient())
             }
