@@ -135,7 +135,7 @@ public struct MultiLineView: View {
     func getClosestDataPoints(toPoint: CGPoint, width:CGFloat, height: CGFloat) {
         self.currentDataNumbers = self.data.compactMap { data in
             let points = data.onlyPoints()
-            let stepWidth: CGFloat = width / CGFloat(points.count-1)
+            let stepWidth: CGFloat = width / CGFloat(points.count)
 //            let stepHeight: CGFloat = height / CGFloat(points.max()! + points.min()!)
 
             let index:Int = Int(floor((toPoint.x-15)/stepWidth))
