@@ -166,22 +166,22 @@ public struct MultiLineView: View {
 struct MultiLineView_Previews: PreviewProvider {
     static var previews: some View {
         let line1 = DummyLineData(
-            dataPoints: (1...10).map { _ in Double.random(in: 0...70) },
+            dataPoints: (0...1).map { _ in Double.random(in: 0...70) },
             color: GradientColor(start: .red, end: .blue)
         )
 
         let line2 = DummyLineData(
-            dataPoints: (0...10).map { _ in Double.random(in: 0...70) },
+            dataPoints: (0...1).map { _ in Double.random(in: 0...70) },
             color: GradientColor(start: .green, end: .blue)
         )
 
         let line3 = DummyLineData(
-            dataPoints: (0...10).map { _ in Double.random(in: 0...70) },
+            dataPoints: (0...1).map { _ in Double.random(in: 0...70) },
             color: GradientColor(start: .black, end: .orange)
         )
 
         let line4 = DummyLineData(
-            dataPoints: (0...10).map { _ in Double.random(in: 0...70) },
+            dataPoints: (0...1).map { _ in Double.random(in: 0...70) },
             color: GradientColor(start: .purple, end: .gray)
         )
 
@@ -189,11 +189,27 @@ struct MultiLineView_Previews: PreviewProvider {
             ZStack {
                 Rectangle().fill(Color.gray)
 
-                MultiLineView(
-                    data: [line1, line2, line3, line4],
-                    title: "Full chart",
-                    style: Styles.lineChartStyleOne
-                ).environment(\.colorScheme, .dark)
+                HStack {
+                    HStack {
+                        Spacer()
+                        Spacer()
+                    }
+                    HStack {
+                        Spacer()
+                        MultiLineView(
+                            data: [line1, line2, line3, line4],
+                            title: "Full chart",
+                            style: Styles.lineChartStyleOne
+                        ).environment(\.colorScheme, .dark)
+                        Spacer()
+                    }
+                    HStack {
+                        Spacer()
+                        Spacer()
+                    }
+                }
+
+
             }
 
 //            MultiLineView(data: [282.502, 284.495, 283.51, 285.019, 285.197, 286.118, 288.737, 288.455, 289.391, 287.691, 285.878, 286.46, 286.252, 284.652, 284.129, 284.188], title: "Full chart", style: Styles.lineChartStyleOne)
