@@ -63,7 +63,7 @@ public struct LineView: View {
                                 max: self.data.onlyPoints().max()!,
                                 min: self.data.onlyPoints().min()!,
                                 dataPointsCount: self.data.onlyPoints().count,
-                                frame: .constant(reader.frame(in: .local)),
+                                frame: reader.frame(in: .local),
                                 hideHorizontalLines: self.$hideHorizontalLines
                             )
                             .transition(.opacity)

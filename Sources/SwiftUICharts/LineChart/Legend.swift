@@ -9,11 +9,11 @@
 import SwiftUI
 
 struct Legend: View {
-    @State var max: Double
-    @State var min: Double
-    @State var dataPointsCount: Int
+    var max: Double
+    var min: Double
+    var dataPointsCount: Int
+    var frame: CGRect
 
-    @Binding var frame: CGRect
     @Binding var hideHorizontalLines: Bool
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     let padding:CGFloat = 30
@@ -90,7 +90,7 @@ struct Legend_Previews: PreviewProvider {
                 max: 8.0,
                 min: 0.2,
                 dataPointsCount: 5,
-                frame: .constant(geometry.frame(in: .local)),
+                frame: geometry.frame(in: .local),
                 hideHorizontalLines: .constant(false),
                 valueSpecifier: "%0.f"
             )

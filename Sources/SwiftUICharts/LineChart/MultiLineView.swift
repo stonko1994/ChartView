@@ -14,7 +14,6 @@ public struct MultiLineView: View {
     public var valueSpecifier: String
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-    @State private var showLegend = false
     @State private var dragLocation:CGPoint = .zero
     @State private var indicatorLocation:CGPoint = .zero
 //    @State private var closestPoints: [CGPoint] = []
@@ -72,36 +71,30 @@ public struct MultiLineView: View {
                     GeometryReader{ reader in
                         Rectangle()
                             .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.backgroundColor : self.style.backgroundColor)
-                        if self.showLegend {
-                            Legend(
-                                max: self.data.flatMap { $0.onlyPoints() }.max()!,
-                                min: self.data.flatMap { $0.onlyPoints() }.min()!,
-                                dataPointsCount: self.data[0].onlyPoints().count,
-                                frame: .constant(reader.frame(in: .local)),
-                                hideHorizontalLines: self.$hideHorizontalLines,
-                                valueSpecifier: "%.0f"
-                            )
-                            .transition(.opacity)
-                            .animation(Animation.easeOut(duration: 1).delay(1))
-                        }
+
+                        Legend(
+                            max: self.data.flatMap { $0.onlyPoints() }.max()!,
+                            min: self.data.flatMap { $0.onlyPoints() }.min()!,
+                            dataPointsCount: self.data[0].onlyPoints().count,
+                            frame: reader.frame(in: .local),
+                            hideHorizontalLines: self.$hideHorizontalLines,
+                            valueSpecifier: "%.0f"
+                        )
+                        .transition(.opacity)
+                        .animation(Animation.easeOut(duration: 1).delay(1))
+
                         ZStack{
-                            ForEach(0..<self.data.count) { i in
-                                Line(data: self.data[i],
+                            ForEach(self.data) { lineChart in
+                                Line(data: lineChart,
                                      frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 30, height: reader.frame(in: .local).height)),
                                      touchLocation: self.$indicatorLocation,
                                      showIndicator: self.$hideHorizontalLines,
                                      minDataValue: .constant(self.globalMin),
                                      maxDataValue: .constant(self.globalMax),
                                      showBackground: false,
-                                     gradient: self.data[i].getGradient()
+                                     gradient: lineChart.getGradient()
                                 )
                                 .offset(x: 30, y: 0)
-                                .onAppear(){
-                                    self.showLegend = true
-                                }
-                                .onDisappear(){
-                                    self.showLegend = false
-                                }
                             }
                         }
                     }
