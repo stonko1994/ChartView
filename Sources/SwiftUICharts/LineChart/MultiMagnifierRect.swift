@@ -21,7 +21,7 @@ public struct MultiMagnifierRect: View {
                         Circle()
                             .fill(number.color.start)
                             .frame(width: 14, height: 14)
-                        Text("\(number.value, specifier: valueSpecifier)")
+                        Text("\(number.value, specifier: self.valueSpecifier)")
                             .fontWeight(.bold)
                             .foregroundColor(self.colorScheme == .dark ? Color.black : Color.white)
                         Spacer()
@@ -38,10 +38,10 @@ public struct MultiMagnifierRect: View {
             if (self.colorScheme == .dark){
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(Color.white, lineWidth: self.colorScheme == .dark ? 2 : 0)
-                    .frame(width: 60, height: 260)
+                    .frame(width: 60)
             } else {
                 RoundedRectangle(cornerRadius: 16)
-                    .frame(width: 60, height: 280)
+                    .frame(width: 60)
                     .foregroundColor(Color.white)
                     .shadow(color: Colors.LegendText, radius: 12, x: 0, y: 6 )
                     .blendMode(.multiply)

@@ -16,7 +16,9 @@ struct Legend: View {
 
     @Binding var hideHorizontalLines: Bool
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-    let padding:CGFloat = 30
+    let padding: CGFloat = 0
+
+    let steps: Int = 4
 
     public var valueSpecifier: String = "%.2f"
 
@@ -28,17 +30,21 @@ struct Legend: View {
     }
     var stepHeight: CGFloat {
         if min < 0 {
-            return (frame.size.height-padding) / CGFloat(max - min)
+            return (frame.size.height - padding) / CGFloat(max - min)
         } else {
-            return (frame.size.height-padding) / CGFloat(max - min)
+            return (frame.size.height - padding) / CGFloat(max - min)
         }
     }
     
     var body: some View {
         ZStack(alignment: .topLeading){
-            ForEach((0...4), id: \.self) { height in
-                HStack(alignment: .center){
-                    Text("\(self.getYLegendSafe(height: height), specifier: valueSpecifier)").offset(x: 0, y: self.getYposition(height: height) )
+            ForEach((0...steps), id: \.self) { height in
+                HStack(alignment: .center) {
+                    Text("\(self.getYLegendSafe(height: height), specifier: self.valueSpecifier)")
+                        .offset(
+                            x: 0,
+                            y: self.getYposition(height: height)
+                        )
                         .foregroundColor(Colors.LegendText)
                         .font(.caption)
                     self.line(atHeight: self.getYLegendSafe(height: height), width: self.frame.width)
@@ -49,9 +55,7 @@ struct Legend: View {
                         .animation(.easeOut(duration: 0.2))
                         .clipped()
                 }
-               
             }
-            
         }
     }
     
@@ -62,9 +66,17 @@ struct Legend: View {
         return 0
     }
     
-    func getYposition(height: Int)-> CGFloat {
+    func getYposition(height: Int) -> CGFloat {
         if let legend = getYLegend() {
-            return (self.frame.height - ((CGFloat(legend[height]) - CGFloat(min))*self.stepHeight))-(self.frame.height/2)
+            return (
+                self.frame.height - (
+                    (
+                        CGFloat(legend[height]) - CGFloat(min)
+                    ) * self.stepHeight
+                )
+            ) - (
+                self.frame.height / 2
+            )
         }
         return 0
        
@@ -78,8 +90,9 @@ struct Legend: View {
     }
     
     func getYLegend() -> [Double]? {
-        let step = Double(max - min) / 4
-        return [min+step * 0, min+step * 1, min+step * 2, min+step * 3, min+step * 4]
+        let step = Double(max - min) / Double(steps)
+        return (0...steps).map { min + step * Double($0) }
+//        return [min+step * 0, min+step * 1, min+step * 2, min+step * 3, min+step * 4]
     }
 }
 
