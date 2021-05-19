@@ -59,10 +59,15 @@ public struct LineView: View {
                         Rectangle()
                             .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.backgroundColor : self.style.backgroundColor)
                         if(self.showLegend){
-                            Legend(data: self.data,
-                                   frame: .constant(reader.frame(in: .local)), hideHorizontalLines: self.$hideHorizontalLines)
-                                .transition(.opacity)
-                                .animation(Animation.easeOut(duration: 1).delay(1))
+                            Legend(
+                                max: self.data.onlyPoints().max()!,
+                                min: self.data.onlyPoints().min()!,
+                                dataPointsCount: self.data.onlyPoints().count,
+                                frame: reader.frame(in: .local),
+                                hideHorizontalLines: self.$hideHorizontalLines
+                            )
+                            .transition(.opacity)
+                            .animation(Animation.easeOut(duration: 1).delay(1))
                         }
                         Line(data: self.data,
                              frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 30, height: reader.frame(in: .local).height)),
@@ -73,7 +78,8 @@ public struct LineView: View {
                              showBackground: false,
                              gradient: self.style.gradientColor
                         )
-                        .offset(x: 30, y: -20)
+                        .background(Color.blue.opacity(0.5))
+                        .offset(x: 30, y: 0)
                         .onAppear(){
                             self.showLegend = true
                         }
@@ -122,7 +128,7 @@ public struct LineView: View {
 struct LineView_Previews: PreviewProvider {
     static var previews: some View {
         Group {
-            LineView(data: [8,23,54,32,12,37,7,23,43], title: "Full chart", style: Styles.lineChartStyleOne)
+            LineView(data: (0...2).map { _ in Double.random(in: 0...70) }, title: "Full chart", style: Styles.lineChartStyleOne)
             
             LineView(data: [282.502, 284.495, 283.51, 285.019, 285.197, 286.118, 288.737, 288.455, 289.391, 287.691, 285.878, 286.46, 286.252, 284.652, 284.129, 284.188], title: "Full chart", style: Styles.lineChartStyleOne)
             

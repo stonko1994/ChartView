@@ -9,40 +9,36 @@
 import SwiftUI
 
 struct Legend: View {
-    @ObservedObject var data: ChartData
-    @Binding var frame: CGRect
+    var max: Double
+    var min: Double
+    var dataPointsCount: Int
+    var frame: CGRect
+
     @Binding var hideHorizontalLines: Bool
     @Environment(\.colorScheme) var colorScheme: ColorScheme
-    let padding:CGFloat = 3
+    let padding:CGFloat = 30
+
+    public var valueSpecifier: String = "%.2f"
 
     var stepWidth: CGFloat {
-        if data.points.count < 2 {
+        if dataPointsCount < 2 {
             return 0
         }
-        return frame.size.width / CGFloat(data.points.count-1)
+        return frame.size.width / CGFloat(dataPointsCount-1)
     }
     var stepHeight: CGFloat {
-        let points = self.data.onlyPoints()
-        if let min = points.min(), let max = points.max(), min != max {
-            if (min < 0){
-                return (frame.size.height-padding) / CGFloat(max - min)
-            }else{
-                return (frame.size.height-padding) / CGFloat(max - min)
-            }
+        if min < 0 {
+            return (frame.size.height-padding) / CGFloat(max - min)
+        } else {
+            return (frame.size.height-padding) / CGFloat(max - min)
         }
-        return 0
-    }
-    
-    var min: CGFloat {
-        let points = self.data.onlyPoints()
-        return CGFloat(points.min() ?? 0)
     }
     
     var body: some View {
         ZStack(alignment: .topLeading){
             ForEach((0...4), id: \.self) { height in
                 HStack(alignment: .center){
-                    Text("\(self.getYLegendSafe(height: height), specifier: "%.2f")").offset(x: 0, y: self.getYposition(height: height) )
+                    Text("\(self.getYLegendSafe(height: height), specifier: valueSpecifier)").offset(x: 0, y: self.getYposition(height: height) )
                         .foregroundColor(Colors.LegendText)
                         .font(.caption)
                     self.line(atHeight: self.getYLegendSafe(height: height), width: self.frame.width)
@@ -68,7 +64,7 @@ struct Legend: View {
     
     func getYposition(height: Int)-> CGFloat {
         if let legend = getYLegend() {
-            return (self.frame.height-((CGFloat(legend[height]) - min)*self.stepHeight))-(self.frame.height/2)
+            return (self.frame.height - ((CGFloat(legend[height]) - CGFloat(min))*self.stepHeight))-(self.frame.height/2)
         }
         return 0
        
@@ -76,16 +72,13 @@ struct Legend: View {
     
     func line(atHeight: CGFloat, width: CGFloat) -> Path {
         var hLine = Path()
-        hLine.move(to: CGPoint(x:5, y: (atHeight-min)*stepHeight))
-        hLine.addLine(to: CGPoint(x: width, y: (atHeight-min)*stepHeight))
+        hLine.move(to: CGPoint(x:5, y: (atHeight-CGFloat(min))*stepHeight))
+        hLine.addLine(to: CGPoint(x: width, y: (atHeight-CGFloat(min))*stepHeight))
         return hLine
     }
     
     func getYLegend() -> [Double]? {
-        let points = self.data.onlyPoints()
-        guard let max = points.max() else { return nil }
-        guard let min = points.min() else { return nil }
-        let step = Double(max - min)/4
+        let step = Double(max - min) / 4
         return [min+step * 0, min+step * 1, min+step * 2, min+step * 3, min+step * 4]
     }
 }
@@ -93,7 +86,14 @@ struct Legend: View {
 struct Legend_Previews: PreviewProvider {
     static var previews: some View {
         GeometryReader{ geometry in
-            Legend(data: ChartData(points: [0.2,0.4,1.4,4.5]), frame: .constant(geometry.frame(in: .local)), hideHorizontalLines: .constant(false))
+            Legend(
+                max: 8.0,
+                min: 0.2,
+                dataPointsCount: 5,
+                frame: geometry.frame(in: .local),
+                hideHorizontalLines: .constant(false),
+                valueSpecifier: "%0.f"
+            )
         }.frame(width: 320, height: 200)
     }
 }

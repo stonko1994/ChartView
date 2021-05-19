@@ -31,3 +31,13 @@ public struct MagnifierRect: View {
         }
     }
 }
+
+struct MagnifierRect_Previews: PreviewProvider {
+    static var previews: some View {
+        Group {
+            MagnifierRect(currentNumber: .constant(20.56), valueSpecifier: "%.1f")
+                .opacity(1.0)
+                .offset(x: 0, y: 36)
+        }
+    }
+}
