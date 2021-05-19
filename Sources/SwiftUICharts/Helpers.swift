@@ -153,6 +153,7 @@ public class ChartStyle {
     public var textColor: Color
     public var legendTextColor: Color
     public var dropShadowColor: Color
+    public var cornerRadius: CGFloat
     public weak var darkModeStyle: ChartStyle?
     
     public init(
@@ -162,6 +163,7 @@ public class ChartStyle {
         textColor: Color,
         legendTextColor: Color,
         dropShadowColor: Color,
+        cornerRadius: CGFloat = 20,
         darkModeStyle: ChartStyle? = nil
     ) {
         self.backgroundColor = backgroundColor
@@ -170,6 +172,7 @@ public class ChartStyle {
         self.textColor = textColor
         self.legendTextColor = legendTextColor
         self.dropShadowColor = dropShadowColor
+        self.cornerRadius = cornerRadius
         self.darkModeStyle = darkModeStyle
     }
     
@@ -179,7 +182,8 @@ public class ChartStyle {
         gradientColor: GradientColor,
         textColor: Color,
         legendTextColor: Color,
-        dropShadowColor: Color
+        dropShadowColor: Color,
+        cornerRadius: CGFloat = 20
     ) {
         self.backgroundColor = backgroundColor
         self.accentColor = accentColor
@@ -187,15 +191,17 @@ public class ChartStyle {
         self.textColor = textColor
         self.legendTextColor = legendTextColor
         self.dropShadowColor = dropShadowColor
+        self.cornerRadius = cornerRadius
     }
     
-    public init(formSize: CGSize){
+    public init(formSize: CGSize) {
         self.backgroundColor = Color.white
         self.accentColor = Colors.OrangeStart
         self.gradientColor = GradientColors.orange
         self.legendTextColor = Color.gray
         self.textColor = Color.black
         self.dropShadowColor = Color.gray
+        self.cornerRadius = 20
     }
 }
 

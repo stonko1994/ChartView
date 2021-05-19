@@ -12,6 +12,7 @@ public struct MultiLineView: View {
     public var style: ChartStyle
     public var darkModeStyle: ChartStyle
     public var valueSpecifier: String
+    public var padding: CGFloat
 
     @Environment(\.colorScheme) var colorScheme: ColorScheme
     @State private var dragLocation:CGPoint = .zero
@@ -27,7 +28,8 @@ public struct MultiLineView: View {
         legend: String? = nil,
         style: ChartStyle = Styles.lineChartStyleOne,
         darkModeStyle: ChartStyle = Styles.lineViewDarkMode,
-        valueSpecifier: String? = "%.1f"
+        valueSpecifier: String? = "%.1f",
+        padding: CGFloat = 30
     ) {
 
         self.data = data.map { MultiLineChartData(points: $0.dataPoints, gradient: $0.color) }
@@ -36,6 +38,7 @@ public struct MultiLineView: View {
         self.style = style
         self.valueSpecifier = valueSpecifier!
         self.darkModeStyle = darkModeStyle
+        self.padding = padding
     }
 
     var globalMin: Double {
@@ -66,48 +69,57 @@ public struct MultiLineView: View {
                             .font(.callout)
                             .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.legendTextColor : self.style.legendTextColor)
                     }
-                }.offset(x: 0, y: 20)
-                ZStack{
+                }.offset(x: 0, y: 00)
+                ZStack {
                     GeometryReader{ reader in
                         Rectangle()
                             .foregroundColor(self.colorScheme == .dark ? self.darkModeStyle.backgroundColor : self.style.backgroundColor)
 
-                        Legend(
-                            max: self.data.flatMap { $0.onlyPoints() }.max()!,
-                            min: self.data.flatMap { $0.onlyPoints() }.min()!,
-                            dataPointsCount: self.data[0].onlyPoints().count,
-                            frame: reader.frame(in: .local),
-                            hideHorizontalLines: self.$hideHorizontalLines,
-                            valueSpecifier: "%.0f"
-                        )
-                        .transition(.opacity)
-                        .animation(Animation.easeOut(duration: 1).delay(1))
+                        ZStack {
+                            Legend(
+                                max: self.data.flatMap { $0.onlyPoints() }.max()!,
+                                min: self.data.flatMap { $0.onlyPoints() }.min()!,
+                                dataPointsCount: self.data[0].onlyPoints().count,
+                                frame: reader.frame(in: .local),
+                                hideHorizontalLines: self.$hideHorizontalLines,
+                                valueSpecifier: "%.0f"
+                            )
+                            .transition(.opacity)
+                            .animation(Animation.easeOut(duration: 1).delay(1))
 
-                        ZStack{
-                            ForEach(self.data) { lineChart in
-                                Line(data: lineChart,
-                                     frame: .constant(CGRect(x: 0, y: 0, width: reader.frame(in: .local).width - 30, height: reader.frame(in: .local).height)),
-                                     touchLocation: self.$indicatorLocation,
-                                     showIndicator: self.$hideHorizontalLines,
-                                     minDataValue: .constant(self.globalMin),
-                                     maxDataValue: .constant(self.globalMax),
-                                     showBackground: false,
-                                     gradient: lineChart.getGradient()
-                                )
-                                .offset(x: 30, y: 0)
+                            ZStack {
+                                ForEach(self.data) { lineChart in
+                                    Line(data: lineChart,
+                                         frame: .constant(
+                                            CGRect(
+                                                x: 0,
+                                                y: 0,
+                                                width: reader.frame(in: .local).width - 30,
+                                                height: reader.frame(in: .local).height
+                                            )
+                                         ),
+                                         touchLocation: self.$indicatorLocation,
+                                         showIndicator: self.$hideHorizontalLines,
+                                         minDataValue: .constant(self.globalMin),
+                                         maxDataValue: .constant(self.globalMax),
+                                         showBackground: false,
+                                         gradient: lineChart.getGradient()
+                                    )
+                                    .offset(x: 30, y: 0)
+                                }
                             }
                         }
                     }
-                    .frame(width: geometry.frame(in: .local).size.width, height: 240)
-                    .offset(x: 0, y: 40 )
+                    .padding(.vertical, padding)
+
                     MultiMagnifierRect(
                         currentNumbers: self.$currentDataNumbers,
                         valueSpecifier: self.valueSpecifier
                     )
+                    .frame(minHeight: 0, maxHeight: .infinity)
                     .opacity(self.opacity)
-                    .offset(x: self.dragLocation.x - geometry.frame(in: .local).size.width/2, y: 52)
+                    .offset(x: self.dragLocation.x - geometry.frame(in: .local).size.width/2, y: 0)
                 }
-                .frame(width: geometry.frame(in: .local).size.width, height: 240)
                 .gesture(DragGesture()
                     .onChanged { value in
                         let width = geometry.frame(in: .local).size.width
@@ -122,8 +134,7 @@ public struct MultiLineView: View {
                         self.opacity = 1
                         self.getClosestDataPoints(
                             to: self.dragLocation,
-                            width: width,
-                            height: 240
+                            width: width
                         )
                         self.hideHorizontalLines = true
                     }
@@ -136,11 +147,10 @@ public struct MultiLineView: View {
         }
     }
 
-    func getClosestDataPoints(to point: CGPoint, width:CGFloat, height: CGFloat) {
+    func getClosestDataPoints(to point: CGPoint, width: CGFloat) {
         self.currentDataNumbers = self.data.compactMap { data in
             let points = data.onlyPoints()
             let stepWidth: CGFloat = width / CGFloat(points.count)
-//            let stepHeight: CGFloat = height / CGFloat(points.max()! + points.min()!)
 
             let index:Int = clamp(
                 Int(floor(point.x / stepWidth)),
